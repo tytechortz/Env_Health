@@ -55,11 +55,33 @@ def get_block_group_data():
     geo_arap['GEOID'] = geo_arap['GEOID'].astype(int)
     
     df = geo_arap.merge(df1, on="GEOID")
-    print(df)
+    
 
     return df
 
-get_block_group_data()
+def get_block_data():
+    block_df1 = pd.read_csv('assets/data/BlockPop.csv')
+    
+    df_HU = get_housing_units()
+    
+    block_df1 = block_df1.merge(df_HU, on="GEOID")
+    
+    geo_arap = block_geo_data
+    
+    geo_arap['GEOID'] = geo_arap['GEOID'].astype(int)
+   
+    block_df1['Total'] = block_df1['Total'].str.replace(',', '').astype(int)
+    
+    df1 = block_geo_data.merge(block_df1, on=["GEOID", "TRACTCE20", "BLOCKCE20", "GEOID20", "NAME20", "ALAND20", "AWATER20", "INTPTLAT20", "INTPTLON20", "Shape_Leng", "Shape_Area", "geometry"])
+    # print(df1)
+
+    return df1
+
+
+
+
+
+
 
 
 
