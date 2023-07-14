@@ -32,6 +32,25 @@ def get_housing_units():
 
     return df_HU
 
+def get_tract_data():
+    df1 = pd.read_csv('assets/data/TractPop.csv')
+    
+    # geo_data = gpd.read_file('2020_CT/ArapahoeCT.shp')
+    # geo_data = geo_data.rename(columns={'FIPS':'GEOID'})
+  
+    # geo_data['GEOID'] = geo_data['GEOID'].astype(int)
+    df1['Total'] = df1['Total'].str.replace(',', '').astype(int)
+    
+   
+    df = tract_geo_data.merge(df1, on="GEOID")
+    print(df)
+    
+    return df
+
+get_tract_data()
+
+
+
 
 
 
