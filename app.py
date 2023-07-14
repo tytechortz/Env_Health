@@ -132,7 +132,7 @@ def get_geo_data(geometry):
         tract_list_df = pd.DataFrame(all_tracts, columns=['tracts'])
     elif geometry == 'Blocks':
         geo_df = get_block_data()
-        print(geo_df.columns)
+        # print(geo_df.columns)
         all_tracts = geo_df["GEOID"].values
         # print(all_tracts)
         tract_list_df = pd.DataFrame(columns=["tracts"])
@@ -145,11 +145,9 @@ def get_geo_data(geometry):
         Input('all-tracts', 'data'))
 def tract_options(geometry, tracts):
     all_tracts = pd.read_json(tracts)
-    # all_tracts = pd.DataFrame(eval(tracts))
-    # print(all_tracts)
-    # print(geometry)
+  
     options = ()
-    # if geometry == "Tracts":
+    
     options = [{'label': i, 'value': i} for i in all_tracts['tracts']]
     
 
@@ -184,7 +182,6 @@ def update_tract_dropdown(clickData, selectedData, tracts, clickData_state):
     return tracts
 
 
-
 @app.callback(
     Output("sa-map", "figure"),
     Output('gt-json', 'data'),
@@ -198,11 +195,9 @@ def update_Choropleth(geo_data, geometry, tracts, opacity):
         geo_data = gpd.read_file(geo_data)
         # print(df)
 
-
     elif geometry == "Blocks":
         df = get_block_data()
         
-
         geo_data = gpd.read_file(geo_data)
     elif geometry == "Tracts":
         df = get_tract_data()
@@ -212,20 +207,8 @@ def update_Choropleth(geo_data, geometry, tracts, opacity):
     geo_tracts_highlights = ()
     # print(geo_data)
     if tracts != None:
-        # print(tracts)
-        # tracts = list(map(str, tracts))
-        # df1 = df.set_index('GEOID')
-        # df1 = df1.sort_index()
-        # print(type(tracts))
-        # print(df1)
-        # geo_tracts_highlights = df[[df["GEOID"] in tracts]]
-        # geo_tracts_highlights = df.loc[df.apply(lambda x: x["GEOID"] in tracts, axis=1)]
         geo_tracts_highlights = df[df['GEOID'].isin(tracts)]
-        # print(geo_tracts_highlights["geometry"])
-        # geo_tracts_highlights["geometry"] = geo_tracts_highlights.simplify(tolerance=200000)
-        # print(geo_tracts_highlights)
-        # tot_pop = geo_tracts_highlights['Total'].sum()
-        # print(tot_pop)
+        
     
     fig = get_figure(df, geo_data, geo_tracts_highlights, opacity)
 
