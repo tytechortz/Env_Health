@@ -132,11 +132,8 @@ def get_geo_data(geometry):
         tract_list_df = pd.DataFrame(all_tracts, columns=['tracts'])
     elif geometry == 'Blocks':
         geo_df = get_block_data()
-        # print(geo_df.columns)
         all_tracts = geo_df["GEOID"].values
-        # print(all_tracts)
-        tract_list_df = pd.DataFrame(columns=["tracts"])
-        # print(tract_list_df)
+        tract_list_df = pd.DataFrame(all_tracts, columns=["tracts"])
     return geo_df.to_json(), tract_list_df.to_json()
 
 @app.callback(
