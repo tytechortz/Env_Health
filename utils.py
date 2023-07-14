@@ -35,19 +35,31 @@ def get_housing_units():
 def get_tract_data():
     df1 = pd.read_csv('assets/data/TractPop.csv')
     
-    # geo_data = gpd.read_file('2020_CT/ArapahoeCT.shp')
-    # geo_data = geo_data.rename(columns={'FIPS':'GEOID'})
-  
-    # geo_data['GEOID'] = geo_data['GEOID'].astype(int)
     df1['Total'] = df1['Total'].str.replace(',', '').astype(int)
-    
    
     df = tract_geo_data.merge(df1, on="GEOID")
-    print(df)
+    # print(df)
     
     return df
 
-get_tract_data()
+def get_block_group_data():
+   
+    df1 = pd.read_csv('assets/data/BlockGroupPop.csv')
+   
+    geo_data = gpd.read_file('assets/data/tl_2022_08_bg (1)/tl_2022_08_bg.shp')
+
+    geo_arap = geo_data[geo_data['COUNTYFP'] == "005"]
+   
+    df1['Total'] = df1['Total'].str.replace(',', '').astype(int)
+   
+    geo_arap['GEOID'] = geo_arap['GEOID'].astype(int)
+    
+    df = geo_arap.merge(df1, on="GEOID")
+    print(df)
+
+    return df
+
+get_block_group_data()
 
 
 
