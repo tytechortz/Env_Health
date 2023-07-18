@@ -15,6 +15,14 @@ tract_geo_data = gpd.read_file('assets/data/2020_CT/ArapahoeCT.shp')
 tract_geo_data = tract_geo_data.rename(columns={'FIPS':'GEOID'})
 tract_geo_data['GEOID'] = tract_geo_data['GEOID'].astype(int)
 
+def get_restaurants():
+    df = pd.read_csv('/Users/jamesswank/Downloads/Geocoded_restaurants_test.csv')
+    # print(df['lat'].isna().sum())
+    # print(df)
+    return df
+
+# get_restaurants()
+
 def get_housing_units():
     df1 = pd.read_csv('assets/data/HousingUnits.csv')
     df1 = df1.iloc[1:]

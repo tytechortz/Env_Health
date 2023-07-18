@@ -5,7 +5,7 @@ import geopandas as gpd
 
 
 def get_Choropleth(df, geo_data, marker_opacity, marker_line_width, marker_line_color, fig=None):
-    
+    print(df.columns)
     if fig is None:
         fig = go.Figure()
 
@@ -13,12 +13,13 @@ def get_Choropleth(df, geo_data, marker_opacity, marker_line_width, marker_line_
         go.Choroplethmapbox(
             geojson=eval(geo_data['geometry'].to_json()),
             locations=df.index,
-            z=df['Total'],
+            z=df['STATEFP'],
             marker_opacity = marker_opacity,
             marker_line_width = marker_line_width,
             marker_line_color = marker_line_color,
             customdata=df["GEOID"],
-            hoverinfo='z'
+            hoverinfo='z',
+            coloraxis='coloraxis'
         )
     )
 
@@ -45,6 +46,7 @@ def get_figure(df, geo_data, geo_tracts_highlights, opacity):
                             mapbox_center={"lat": 39.65, "lon": -104.8},
                             margin={"r":0,"t":0,"l":0,"b":0},
                             autosize=True,
+                            coloraxis_showscale=False,
                             uirevision='constant'),
     
                         

@@ -3,11 +3,13 @@ import dash_bootstrap_components as dbc
 import geopandas as gpd
 import pandas as pd
 import plotly.graph_objects as go
+from geopandas.tools import sjoin
 
 from utils import (
     get_tract_data,
     get_block_data,
     get_block_group_data,
+    get_restaurants
 )
 
 from figures_utilities import (
@@ -16,7 +18,7 @@ from figures_utilities import (
 
 app = Dash(__name__, suppress_callback_exceptions=True, external_stylesheets=[dbc.themes.DARKLY])
 
-header = html.Div("Arapahoe County Population", className="h2 p-2 text-white bg-primary text-center")
+header = html.Div("Arapahoe County EH", className="h2 p-2 text-white bg-primary text-center")
 
 bgcolor = "#f3f3f1"  # mapbox light map land color
 
@@ -200,6 +202,17 @@ def update_Choropleth(geo_data, geometry, tracts, opacity):
         df = get_tract_data()
         # print(df['geometry'])
         geo_data = gpd.read_file(geo_data)
+        restaurants = get_restaurants()
+        restaurants = gpd.GeoDataFrame(restaurants,
+            geometry = gpd.points_from_xy(restaurants['lon'], restaurants['lat']))
+        restaurants = restaurants.set_crs('epsg:4326')
+
+        rl = sjoin(restaurants, geo_data, how='inner')
+        rls = rl.groupby('GEOID').size().reset_index(name='count')
+        # print(rl.columns)
+        # print(rls)
+        # print(rl)
+
         # print(geo_data)
     geo_tracts_highlights = ()
     # print(geo_data)
