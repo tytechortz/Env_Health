@@ -23,6 +23,20 @@ def get_Choropleth(df, geo_data, marker_opacity, marker_line_width, marker_line_
         )
     )
 
+    # fig.add_trace(
+    #     go.Scattermapbox(
+    #         geojson=eval(geo_data['geometry'].to_json()),
+    #         locations=df.index,
+    #         z=df['STATEFP'],
+    #         marker_opacity = marker_opacity,
+    #         marker_line_width = marker_line_width,
+    #         marker_line_color = marker_line_color,
+    #         customdata=df["GEOID"],
+    #         hoverinfo='z',
+    #         coloraxis='coloraxis'
+    #     )
+    # )
+
     return fig
 
 

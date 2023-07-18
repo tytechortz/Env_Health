@@ -205,7 +205,7 @@ def update_Choropleth(geo_data, geometry, tracts, opacity):
         restaurants = get_restaurants()
         restaurants = gpd.GeoDataFrame(restaurants,
             geometry = gpd.points_from_xy(restaurants['lon'], restaurants['lat']))
-        restaurants = restaurants.set_crs('epsg:4326')
+        restaurants = restaurants.set_crs('epsg:4269')
 
         rl = sjoin(restaurants, geo_data, how='inner')
         rls = rl.groupby('GEOID').size().reset_index(name='count')

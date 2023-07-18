@@ -73,6 +73,7 @@ def get_block_data():
     df_HU = get_housing_units()
     
     block_df1 = block_df1.merge(df_HU, on="GEOID")
+    block_df1['STATEFP'] = 5
     
     geo_arap = block_geo_data
     
