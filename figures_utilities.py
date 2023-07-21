@@ -29,8 +29,8 @@ def get_Choropleth(df, geo_data, rl, marker_opacity, marker_line_width, marker_l
             lon=rl['lon'],
             mode='markers',
             marker=go.scattermapbox.Marker(
-                size=15,
-                color='blue',
+                size=3,
+                color='red',
             ),
             showlegend=False
         )
@@ -46,7 +46,7 @@ def get_map(df):
     return fig
 
 
-def get_figure(df, geo_data, geo_tracts_highlights, opacity, rl):
+def get_figure(df, geo_data, rl, geo_tracts_highlights, opacity):
 
     # print(df)
     fig = get_Choropleth(df, geo_data, rl, marker_opacity=opacity,
@@ -65,7 +65,7 @@ def get_figure(df, geo_data, geo_tracts_highlights, opacity, rl):
                         
     
     if len(geo_tracts_highlights) != 0:
-        fig = get_Choropleth(df, geo_tracts_highlights, marker_opacity=1.0,
+        fig = get_Choropleth(df, geo_tracts_highlights, rl, marker_opacity=1.0,
                              marker_line_width=3, marker_line_color='aqua', fig=fig)
     
 

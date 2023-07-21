@@ -16,6 +16,13 @@ from figures_utilities import (
     get_figure
 )
 
+def get_facilities():
+        restaurants = get_restaurants()
+        restaurants = gpd.GeoDataFrame(restaurants,
+            geometry = gpd.points_from_xy(restaurants['lon'], restaurants['lat']))
+        restaurants = restaurants.set_crs('epsg:4269')
+        return restaurants
+
 app = Dash(__name__, suppress_callback_exceptions=True, external_stylesheets=[dbc.themes.DARKLY])
 
 header = html.Div("Arapahoe County EH", className="h2 p-2 text-white bg-primary text-center")
@@ -189,6 +196,14 @@ def update_tract_dropdown(clickData, selectedData, tracts, clickData_state):
     Input("tracts", "value"),
     Input("opacity", "value"))
 def update_Choropleth(geo_data, geometry, tracts, opacity):
+
+    # def get_facilities():
+    #     restaurants = get_restaurants()
+    #     restaurants = gpd.GeoDataFrame(restaurants,
+    #         geometry = gpd.points_from_xy(restaurants['lon'], restaurants['lat']))
+    #     restaurants = restaurants.set_crs('epsg:4269')
+    #     return restaurants
+
     if geometry == "Block Groups":
         df = get_block_group_data()
         geo_data = gpd.read_file(geo_data)
@@ -202,16 +217,18 @@ def update_Choropleth(geo_data, geometry, tracts, opacity):
         df = get_tract_data()
         # print(df['geometry'])
         geo_data = gpd.read_file(geo_data)
-        restaurants = get_restaurants()
-        restaurants = gpd.GeoDataFrame(restaurants,
-            geometry = gpd.points_from_xy(restaurants['lon'], restaurants['lat']))
-        restaurants = restaurants.set_crs('epsg:4269')
+        # restaurants = get_restaurants()
+        # restaurants = gpd.GeoDataFrame(restaurants,
+        #     geometry = gpd.points_from_xy(restaurants['lon'], restaurants['lat']))
+        # restaurants = restaurants.set_crs('epsg:4269')
 
-        rl = sjoin(restaurants, geo_data, how='inner')
-        rls = rl.groupby('GEOID').size().reset_index(name='count')
-        print(rl.columns)
-        print(rls)
-        print(rl)
+    restaurants = get_facilities()
+
+    rl = sjoin(restaurants, geo_data, how='inner')
+    rls = rl.groupby('GEOID').size().reset_index(name='count')
+    print(rl.columns)
+    print(rls)
+    print(rl)
 
         # print(geo_data)
     geo_tracts_highlights = ()
@@ -220,7 +237,7 @@ def update_Choropleth(geo_data, geometry, tracts, opacity):
         geo_tracts_highlights = df[df['GEOID'].isin(tracts)]
         
     
-    fig = get_figure(df, geo_data, geo_tracts_highlights, opacity, rl)
+    fig = get_figure(df, geo_data, rl, geo_tracts_highlights, opacity)
 
     return fig, geo_tracts_highlights.to_json()
 
