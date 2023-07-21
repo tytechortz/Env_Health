@@ -5,7 +5,7 @@ import geopandas as gpd
 
 
 def get_Choropleth(df, geo_data, rl, marker_opacity, marker_line_width, marker_line_color, fig=None):
-    # print(df.columns)
+    # print(rl.columns)
     if fig is None:
         fig = go.Figure()
 
@@ -30,7 +30,7 @@ def get_Choropleth(df, geo_data, rl, marker_opacity, marker_line_width, marker_l
             mode='markers',
             marker=go.scattermapbox.Marker(
                 size=3,
-                color='red',
+                color='black',
             ),
             showlegend=False
         )

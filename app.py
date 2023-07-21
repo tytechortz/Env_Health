@@ -103,14 +103,18 @@ app.layout = dbc.Container([
     dcc.Store(id='geo-data', storage_type='memory'),
     dcc.Store(id='all-tracts', storage_type='memory'),
     dcc.Store(id='gt-json', storage_type='memory'),
+    dcc.Store(id='facilities', storage_type='session'),
 ])
 
 @app.callback(
         Output('tract-stats', 'children'),
         Input('geometry', 'value'),
-        Input('gt-json', 'data'))
-def get_tract_stats(geometry, gt_json):
+        Input('gt-json', 'data'),
+        Input('facilities', 'data'))
+def get_tract_stats(geometry, gt_json, facilities):
     gtj = gpd.read_file(gt_json)
+    fac = gpd.read_file(facilities)
+    print(fac)
     # print(gtj['Total'])
     if gtj.empty:
         tot_pop=0
@@ -191,6 +195,7 @@ def update_tract_dropdown(clickData, selectedData, tracts, clickData_state):
 @app.callback(
     Output("sa-map", "figure"),
     Output('gt-json', 'data'),
+    Output('facilities', 'data'),
     Input("geo-data", "data"),
     Input("geometry", "value"),
     Input("tracts", "value"),
@@ -222,24 +227,29 @@ def update_Choropleth(geo_data, geometry, tracts, opacity):
         #     geometry = gpd.points_from_xy(restaurants['lon'], restaurants['lat']))
         # restaurants = restaurants.set_crs('epsg:4269')
 
-    restaurants = get_facilities()
+    # restaurants = get_facilities()
 
-    rl = sjoin(restaurants, geo_data, how='inner')
-    rls = rl.groupby('GEOID').size().reset_index(name='count')
-    print(rl.columns)
-    print(rls)
-    print(rl)
+    # rl = sjoin(restaurants, geo_data, how='inner')
+    # rls = rl.groupby('GEOID').size().reset_index(name='count')
+    # print(rl.columns)
+    # print(rls)
+    # print(rl)
 
         # print(geo_data)
     geo_tracts_highlights = ()
     # print(geo_data)
     if tracts != None:
+        restaurants = get_facilities()
         geo_tracts_highlights = df[df['GEOID'].isin(tracts)]
+        rl = sjoin(restaurants, geo_data, how='inner')
+        rls = rl[rl['GEOID'].isin(tracts)]
+        print(rls.columns)
+        # rls = rl.groupby('GEOID').size().reset_index(name='count')
         
     
     fig = get_figure(df, geo_data, rl, geo_tracts_highlights, opacity)
 
-    return fig, geo_tracts_highlights.to_json()
+    return fig, geo_tracts_highlights.to_json(), rls.to_json()
 
 if __name__ == "__main__":
     app.run_server(debug=True, port=8080)
