@@ -4,8 +4,8 @@ import numpy as np
 import geopandas as gpd
 
 
-def get_Choropleth(df, geo_data, marker_opacity, marker_line_width, marker_line_color, fig=None):
-    print(df.columns)
+def get_Choropleth(df, geo_data, rl, marker_opacity, marker_line_width, marker_line_color, fig=None):
+    # print(df.columns)
     if fig is None:
         fig = go.Figure()
 
@@ -23,19 +23,18 @@ def get_Choropleth(df, geo_data, marker_opacity, marker_line_width, marker_line_
         )
     )
 
-    # fig.add_trace(
-    #     go.Scattermapbox(
-    #         geojson=eval(geo_data['geometry'].to_json()),
-    #         locations=df.index,
-    #         z=df['STATEFP'],
-    #         marker_opacity = marker_opacity,
-    #         marker_line_width = marker_line_width,
-    #         marker_line_color = marker_line_color,
-    #         customdata=df["GEOID"],
-    #         hoverinfo='z',
-    #         coloraxis='coloraxis'
-    #     )
-    # )
+    fig.add_trace(
+        go.Scattermapbox(
+            lat=rl['lat'],
+            lon=rl['lon'],
+            mode='markers',
+            marker=go.scattermapbox.Marker(
+                size=15,
+                color='blue',
+            ),
+            showlegend=False
+        )
+    )
 
     return fig
 
@@ -47,10 +46,10 @@ def get_map(df):
     return fig
 
 
-def get_figure(df, geo_data, geo_tracts_highlights, opacity):
+def get_figure(df, geo_data, geo_tracts_highlights, opacity, rl):
 
     # print(df)
-    fig = get_Choropleth(df, geo_data, marker_opacity=opacity,
+    fig = get_Choropleth(df, geo_data, rl, marker_opacity=opacity,
                          marker_line_width=1, marker_line_color='#6666cc')
     
     

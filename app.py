@@ -209,9 +209,9 @@ def update_Choropleth(geo_data, geometry, tracts, opacity):
 
         rl = sjoin(restaurants, geo_data, how='inner')
         rls = rl.groupby('GEOID').size().reset_index(name='count')
-        # print(rl.columns)
-        # print(rls)
-        # print(rl)
+        print(rl.columns)
+        print(rls)
+        print(rl)
 
         # print(geo_data)
     geo_tracts_highlights = ()
@@ -220,7 +220,7 @@ def update_Choropleth(geo_data, geometry, tracts, opacity):
         geo_tracts_highlights = df[df['GEOID'].isin(tracts)]
         
     
-    fig = get_figure(df, geo_data, geo_tracts_highlights, opacity)
+    fig = get_figure(df, geo_data, geo_tracts_highlights, opacity, rl)
 
     return fig, geo_tracts_highlights.to_json()
 
