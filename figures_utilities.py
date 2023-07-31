@@ -29,7 +29,7 @@ def get_Choropleth(df, geo_data, rl, marker_opacity, marker_line_width, marker_l
             lon=rl['lon'],
             mode='markers',
             marker=go.scattermapbox.Marker(
-                size=3,
+                size=5,
                 color='black',
             ),
             showlegend=False

@@ -1,9 +1,11 @@
-from dash import Dash, html, dcc, Input, Output, State, ctx
+from dash import Dash, html, dcc, Input, Output, State, ctx, dash_table
 import dash_bootstrap_components as dbc
 import geopandas as gpd
 import pandas as pd
 import plotly.graph_objects as go
 from geopandas.tools import sjoin
+import dash_ag_grid as dag
+import json
 
 from utils import (
     get_tract_data,
@@ -16,6 +18,20 @@ from figures_utilities import (
     get_figure
 )
 
+# columnDefs = [
+#     {"field": "profileid", "headerName": "CDCID"},
+#     {"field": "first_name"},
+#     {"field": "geocoded_latitude"},
+#     {"field": "geocoded_longitude"},
+#     {
+#         "field": "reporteddate",
+#         "filter": "agDateColumnFilter",
+#         "valueGetter": {"function": date_obj},
+#         "valueFormatter": {"function": f"d3.timeFormat('%m/%d/%Y')({date_obj})"},
+#     }
+# ]
+# df = selected_facilities
+
 def get_facilities():
         restaurants = get_restaurants()
         restaurants = gpd.GeoDataFrame(restaurants,
@@ -23,7 +39,9 @@ def get_facilities():
         restaurants = restaurants.set_crs('epsg:4269')
         return restaurants
 
-app = Dash(__name__, suppress_callback_exceptions=True, external_stylesheets=[dbc.themes.DARKLY])
+# app = Dash(__name__, suppress_callback_exceptions=True, external_stylesheets=[dbc.themes.DARKLY])
+app = Dash(__name__, suppress_callback_exceptions=True)
+
 
 header = html.Div("Arapahoe County EH", className="h2 p-2 text-white bg-primary text-center")
 
@@ -51,6 +69,19 @@ def blank_fig(height):
             "yaxis": {"visible": False},
         },
     }
+
+# grid = dag.AgGrid(
+#     id="case-grid",
+#     # columnDefs=[{"headerName": i, "field": i, "editable": False} for i in case_df.columns],
+#     columnDefs = columnDefs,
+#     rowData=case_df.to_dict("records"),
+#     dashGridOptions={"rowSelection": "muiltiple"},
+#     # columnSize="sizeToFit",
+#     defaultColDef={"resizable": True, "sortable": True, "filter": True},
+#     csvExportParams={
+#                 "fileName": "ag_grid_test.csv",
+#             },  
+# )
 
 app.layout = dbc.Container([
     header,
@@ -100,11 +131,130 @@ app.layout = dbc.Container([
             html.Div(id='tract-stats')
         ], width=4)
     ]),
+    dbc.Row([
+        html.Div(id='datatable'),
+    ]),  
     dcc.Store(id='geo-data', storage_type='memory'),
     dcc.Store(id='all-tracts', storage_type='memory'),
     dcc.Store(id='gt-json', storage_type='memory'),
     dcc.Store(id='facilities', storage_type='session'),
 ])
+
+@app.callback(
+        Output('datatable-interactivity', 'data'),
+        Output('datatable-interactivity', 'columns'),
+        Input('facilities', 'data'),
+        Input('gt-json', 'data'))
+def get_facility_table(sel_data, gt_json):
+    df = gpd.read_file(sel_data)
+    gtj = gpd.read_file(gt_json)
+    if  df.empty:
+        
+
+        df1 = pd.DataFrame(columns=['Permit Name', 'Address'])
+        data = df1.to_dict('records')
+        columns=[
+            {"name": i, "id": i} for i in df1.columns
+        ]
+
+    else:
+        
+        print(df)
+        # stuff = json.load(open(sel_data))
+        # df = pd.DataFrame(stuff)
+        # print(df['Permit Name'])
+        # print(list(df.columns))
+        df['id'] = df['Permit Name']
+        df1 = df[['Permit Name', 'Address']]
+        # print(df1.colu÷mns)
+        # df = df.__geo_interface__
+
+        data = df1.to_dict('records')
+        # print(data)
+        
+        columns=[
+            {"name": i, "id": i} for i in df1.columns
+        ]
+
+
+    # if gtj.empty:
+    #     data = df1.to_dict('records')
+    # # print(data)
+    
+    #     columns=[
+    #         {"name": i, "id": i} for i in df1.columns
+    #     ]
+
+    # else:
+    #     data = df1.to_dict('records')
+    # # print(data)
+    
+    #     columns=[
+    #         {"name": i, "id": i} for i in df1.columns
+    #     ]
+    # print(columns)
+
+    return data, columns
+
+@app.callback(
+        Output('datatable', 'children'),
+        Input('opacity', 'value'),
+        # Input('facility-list', 'columns')
+)
+def display_facility_table(data):
+    
+
+
+    return dash_table.DataTable(id='datatable-interactivity', 
+        data=[{}],
+        columns=[{'name': 'Permit Name', 'id': 'Permit Name'}, {'name': 'Address', 'id': 'Address'}],
+        # style_cell_conditional=[
+        #     {'if': {'column_id': 'Permit Name'},
+        #     'width':'100px'},
+            # {'if': {'column_id': 'TMAX'},
+            # 'width':'100px'},
+            # {'if': {'column_id': 'TMIN'},
+            # 'width':'100px'},
+        # ],
+        # style_data_conditional=[
+        #     {
+        #     'if': {'row_index': 'odd'},
+        #     'backgroundColor': 'rgb(248, 248, 248)'
+        #     },
+        # ],
+        style_header={
+        'backgroundColor': 'rgb(30, 30, 30)',
+        'fontWeight': 'bold',
+        'color': 'white'
+        },
+        # editable=True,
+        # filter_action="native",
+        sort_action="native",
+        sort_mode="multi",
+        # column_selectable="single",
+        # selected_columns=[],
+        # selected_rows=[],
+        # page_action="native",
+        page_current= 0,
+        page_size= 30,
+        # columns=columns,
+        # fixed_rows={'headers': False, 'data': 0}
+        # columns=[{}],
+        style_data={
+            'backgroundColor': 'rgb(30,30,30)',
+            'color':'white'
+        }
+    )
+
+
+# @app.callback(
+#         Output('facility-list', 'figure'),
+#         Input('facilities', 'data'))
+# def get_table(rows):
+#     df = gpd.read_file(rows)
+#     return print('hello world')
+    
+
 
 @app.callback(
         Output('tract-stats', 'children'),
@@ -114,7 +264,7 @@ app.layout = dbc.Container([
 def get_tract_stats(geometry, gt_json, facilities):
     gtj = gpd.read_file(gt_json)
     fac = gpd.read_file(facilities)
-    print(fac)
+    # print(fac)
     # print(gtj['Total'])
     if gtj.empty:
         tot_pop=0
@@ -155,7 +305,7 @@ def get_geo_data(geometry):
         Input('all-tracts', 'data'))
 def tract_options(geometry, tracts):
     all_tracts = pd.read_json(tracts)
-  
+    # print(type(tracts))
     options = ()
     
     options = [{'label': i, 'value': i} for i in all_tracts['tracts']]
@@ -243,7 +393,10 @@ def update_Choropleth(geo_data, geometry, tracts, opacity):
         geo_tracts_highlights = df[df['GEOID'].isin(tracts)]
         rl = sjoin(restaurants, geo_data, how='inner')
         rls = rl[rl['GEOID'].isin(tracts)]
-        print(rls.columns)
+        # print(rls.columns)
+        # print(type(rls))
+        # df_rls = pd.DataFrame(rls[rls['Permit Name']])
+        # print(type(df_rls))
         # rls = rl.groupby('GEOID').size().reset_index(name='count')
         
     
