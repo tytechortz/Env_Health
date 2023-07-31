@@ -149,57 +149,28 @@ def get_facility_table(sel_data, gt_json):
     df = gpd.read_file(sel_data)
     gtj = gpd.read_file(gt_json)
     if  df.empty:
-        
-
         df1 = pd.DataFrame(columns=['Permit Name', 'Address'])
         data = df1.to_dict('records')
         columns=[
             {"name": i, "id": i} for i in df1.columns
         ]
-
     else:
-        
-        print(df)
-        # stuff = json.load(open(sel_data))
-        # df = pd.DataFrame(stuff)
-        # print(df['Permit Name'])
-        # print(list(df.columns))
         df['id'] = df['Permit Name']
         df1 = df[['Permit Name', 'Address']]
-        # print(df1.colu÷mns)
-        # df = df.__geo_interface__
+       
 
         data = df1.to_dict('records')
-        # print(data)
         
         columns=[
             {"name": i, "id": i} for i in df1.columns
         ]
 
-
-    # if gtj.empty:
-    #     data = df1.to_dict('records')
-    # # print(data)
-    
-    #     columns=[
-    #         {"name": i, "id": i} for i in df1.columns
-    #     ]
-
-    # else:
-    #     data = df1.to_dict('records')
-    # # print(data)
-    
-    #     columns=[
-    #         {"name": i, "id": i} for i in df1.columns
-    #     ]
-    # print(columns)
 
     return data, columns
 
 @app.callback(
         Output('datatable', 'children'),
         Input('opacity', 'value'),
-        # Input('facility-list', 'columns')
 )
 def display_facility_table(data):
     
@@ -247,14 +218,6 @@ def display_facility_table(data):
     )
 
 
-# @app.callback(
-#         Output('facility-list', 'figure'),
-#         Input('facilities', 'data'))
-# def get_table(rows):
-#     df = gpd.read_file(rows)
-#     return print('hello world')
-    
-
 
 @app.callback(
         Output('tract-stats', 'children'),
@@ -264,8 +227,7 @@ def display_facility_table(data):
 def get_tract_stats(geometry, gt_json, facilities):
     gtj = gpd.read_file(gt_json)
     fac = gpd.read_file(facilities)
-    # print(fac)
-    # print(gtj['Total'])
+
     if gtj.empty:
         tot_pop=0
     else:
@@ -352,12 +314,7 @@ def update_tract_dropdown(clickData, selectedData, tracts, clickData_state):
     Input("opacity", "value"))
 def update_Choropleth(geo_data, geometry, tracts, opacity):
 
-    # def get_facilities():
-    #     restaurants = get_restaurants()
-    #     restaurants = gpd.GeoDataFrame(restaurants,
-    #         geometry = gpd.points_from_xy(restaurants['lon'], restaurants['lat']))
-    #     restaurants = restaurants.set_crs('epsg:4269')
-    #     return restaurants
+   
 
     if geometry == "Block Groups":
         df = get_block_group_data()
@@ -372,20 +329,7 @@ def update_Choropleth(geo_data, geometry, tracts, opacity):
         df = get_tract_data()
         # print(df['geometry'])
         geo_data = gpd.read_file(geo_data)
-        # restaurants = get_restaurants()
-        # restaurants = gpd.GeoDataFrame(restaurants,
-        #     geometry = gpd.points_from_xy(restaurants['lon'], restaurants['lat']))
-        # restaurants = restaurants.set_crs('epsg:4269')
-
-    # restaurants = get_facilities()
-
-    # rl = sjoin(restaurants, geo_data, how='inner')
-    # rls = rl.groupby('GEOID').size().reset_index(name='count')
-    # print(rl.columns)
-    # print(rls)
-    # print(rl)
-
-        # print(geo_data)
+       
     geo_tracts_highlights = ()
     # print(geo_data)
     if tracts != None:
@@ -393,11 +337,7 @@ def update_Choropleth(geo_data, geometry, tracts, opacity):
         geo_tracts_highlights = df[df['GEOID'].isin(tracts)]
         rl = sjoin(restaurants, geo_data, how='inner')
         rls = rl[rl['GEOID'].isin(tracts)]
-        # print(rls.columns)
-        # print(type(rls))
-        # df_rls = pd.DataFrame(rls[rls['Permit Name']])
-        # print(type(df_rls))
-        # rls = rl.groupby('GEOID').size().reset_index(name='count')
+     
         
     
     fig = get_figure(df, geo_data, rl, geo_tracts_highlights, opacity)
